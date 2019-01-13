@@ -9,7 +9,7 @@ use yii\bootstrap\ActiveForm;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
-?>
+?><head><link rel="shortcut icon" href="/web/favicon.ico.png" type="image/x-icon"></head>
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -31,7 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'rememberMe')->checkbox([
             'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
         ]) ?>
-
+    <?= $form->field($model, 'captcha')->widget(\yii\captcha\Captcha::classname(), [
+        // configure additional widget properties here
+    ]) ?>
         <div class="form-group">
             <div class="col-lg-offset-1 col-lg-11">
                 <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>

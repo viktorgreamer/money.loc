@@ -63,7 +63,6 @@ use yii\widgets\ActiveForm;
          </div>
 
 
-    <h2>jdlkjflksjdfklsdjsf </h2>
     <?= $form->field($model, 'captcha')->widget(\yii\captcha\Captcha::classname(), [
         // configure additional widget properties here
     ]) ?>

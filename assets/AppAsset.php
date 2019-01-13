@@ -23,6 +23,7 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/bootstrap.css',
         'css/site.css',
+        "https://fonts.googleapis.com/css?family=Roboto+Slab",
     ];
     public $js = [
     ];

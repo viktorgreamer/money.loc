@@ -1,0 +1,14 @@
+{
+    "name": "viktorgreamer/dlogger",
+    "description": "Beautifull logger for php",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Viktor VAsilev",
+            "email": "an.viktory@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}

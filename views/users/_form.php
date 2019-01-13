@@ -40,6 +40,10 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'birthday')->textInput() ?>
+    <?= $form->field($model, 'captcha')->widget(\yii\captcha\Captcha::classname(), [
+        // configure additional widget properties here
+    ]) ?>
+    
 
 
 

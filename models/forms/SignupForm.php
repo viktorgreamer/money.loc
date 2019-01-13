@@ -37,6 +37,7 @@ class SignupForm extends Model
     public $created_at;
     public $updated_at;
     public $agree_with_agreement;
+    public $captcha;
 
     /**
      * @inheritdoc

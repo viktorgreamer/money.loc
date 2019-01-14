@@ -106,7 +106,7 @@ class Payments extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'type' => 'Type',
+            'Type' => Yii::t('app','Type'),
             'value' => 'Value',
             'valueText' => 'Value',
             'status' => 'Status',

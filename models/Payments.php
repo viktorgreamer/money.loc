@@ -104,15 +104,15 @@ class Payments extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'user_id' => 'User ID',
-            'type' => 'Type',
-            'value' => 'Value',
-            'valueText' => 'Value',
-            'status' => 'Status',
-            'confirm_status' => 'Confirm Status',
-            'confirmed_at' => 'Confirmed_at',
-            'created_at' => 'Created_at',
+            'id' => Yii::t('app','ID'),
+            'user_id' => Yii::t('app','User ID'),
+            'Type' => Yii::t('app','Type'),
+            'value' => Yii::t('app','Value'),
+            'valueText' => Yii::t('app','Value'),
+            'status' => Yii::t('app','Status'),
+            'confirm_status' => Yii::t('app','Confirm Status'),
+            'confirmed_at' => Yii::t('app','Confirmed_at'),
+            'created_at' => Yii::t('app','Created_at'),
         ];
     }
 }

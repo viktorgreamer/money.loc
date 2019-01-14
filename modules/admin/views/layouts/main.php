@@ -43,6 +43,8 @@ AppAsset::register($this);
     ];
 
     $menuItems[] = ['label' => 'Users', 'url' => '/admin/users/'];
+    $menuItems[] = ['label' => 'Messages', 'url' => '/messages/index/'];
+    $menuItems[] = ['label' => 'Source-messages', 'url' => '/source-messages/index/'];
     $menuItems[] = ['label' => 'Payments', 'url' => '/admin/payments/'];
 
     $menuItems[] = '<li>'

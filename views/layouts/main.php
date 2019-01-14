@@ -39,22 +39,23 @@ AppAsset::register($this);
     ]);
 
     $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Admin', 'url' => ['/admin']],
+        ['label' => Yii::t('app','Home'), 'url' => ['/site/index']],
+        ['label' => Yii::t('app','About'), 'url' => ['/site/about']],
+        ['label' => Yii::t('app','Admin'), 'url' => ['/admin']],
+
     ];
 
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/users/signup']];
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => Yii::t('app','Signup'), 'url' => ['/users/signup']];
+        $menuItems[] = ['label' => Yii::t('app','Login'), 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => 'User',
+        $menuItems[] = ['label' => Yii::t('app','User'),
             'items' => [
-                ['label' => 'Home', 'url' => '/users/home/'],
-                ['label' => 'Money Management', 'url' => '/users/money-managment/'],
-                ['label' => 'Payments', 'url' => '/payments/index/'],
-                ['label' => 'Statement', 'url' => '/users/statement/'],
-                ['label' => 'Settings', 'url' => '/users/settings/'],]
+                ['label' => Yii::t('app','Home'), 'url' => '/users/home/'],
+                ['label' => Yii::t('app','Money Management'), 'url' => '/users/money-managment/'],
+                ['label' => Yii::t('app','Payments'), 'url' => '/payments/index/'],
+                ['label' => Yii::t('app','Statement'), 'url' => '/users/statement/'],
+                ['label' => Yii::t('app','Settings'), 'url' => '/users/settings/'],]
 
         ];
 

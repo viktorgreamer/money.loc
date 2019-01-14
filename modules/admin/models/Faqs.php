@@ -40,10 +40,10 @@ class Faqs extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'question' => 'Question',
-            'answer' => 'Answer',
-            'lg' => 'Lg',
+            'id' => Yii::t('app','ID'),
+            'question' => Yii::t('app','Question'),
+            'answer' => Yii::t('app','Answer'),
+            'lg' => Yii::t('app','Lg'),
         ];
     }
 }

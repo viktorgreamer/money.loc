@@ -7,9 +7,12 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language' => 'es',
+   // 'languages' => ['en', 'es'],
+    // 'sourceLanguage' => 'es',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'modules' => [
         'admin' => [
@@ -17,6 +20,21 @@ $config = [
         ],
     ],
     'components' => [
+
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\DbMessageSource',
+                  //  'basePath' => '@app/messages',
+                    'sourceLanguage' => 'en-US',
+                  /*  'fileMap' => [
+                        'app' => 'app.php',
+                        'app/error' => 'error.php',
+                    ],*/
+                ],
+            ],
+        ],
+
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@webroot/mail',

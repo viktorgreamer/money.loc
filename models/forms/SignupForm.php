@@ -76,7 +76,7 @@ class SignupForm extends Model
             'State' => 'State',
             'postal' => 'Postal',
             'country_id' => 'Country ID',
-            'lg' => 'Lg',
+            'lg' => 'Language',
             'phone' => 'Phone',
             'birthday' => 'Birthday',
             'email' => 'Email',

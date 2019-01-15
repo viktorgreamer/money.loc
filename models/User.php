@@ -72,8 +72,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public static function mapLang()
     {
         return [
-            1 => "EN",
-            2 => 'ES'
+            'en' => "EN",
+            'es' => 'ES'
         ];
     }
 
@@ -84,9 +84,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['first_name', 'last_name', 'address_line1', 'city', 'state', 'postal', 'country_id', 'lg', 'phone', 'birthday', 'email', 'username', 'auth_key', 'password_hash', 'status', 'created_at'], 'required'],
-            [['postal','role', 'country_id', 'lg', 'status', 'created_at', 'updated_at', 'visited_at', 'billing'], 'integer'],
+            [['postal','role', 'country_id', 'status', 'created_at', 'updated_at', 'visited_at', 'billing'], 'integer'],
             [['birthday'], 'safe'],
-            [['first_name', 'last_name', 'company_name', 'address_line1', 'address_line2', 'city', 'state', 'email', 'username', 'add_contacts'], 'string', 'max' => 256],
+            [['first_name', 'last_name', 'company_name', 'lg','address_line1', 'address_line2', 'city', 'state', 'email', 'username', 'add_contacts'], 'string', 'max' => 256],
             [['phone'], 'string', 'max' => 15],
         ];
     }

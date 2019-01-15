@@ -8,7 +8,7 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'language' => 'en',
-   // 'languages' => ['en', 'es'],
+    // 'languages' => ['en', 'es'],
     // 'sourceLanguage' => 'es',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -25,12 +25,12 @@ $config = [
             'translations' => [
                 'app*' => [
                     'class' => 'yii\i18n\DbMessageSource',
-                  //  'basePath' => '@app/messages',
+                    //  'basePath' => '@app/messages',
                     'sourceLanguage' => 'en-US',
-                  /*  'fileMap' => [
-                        'app' => 'app.php',
-                        'app/error' => 'error.php',
-                    ],*/
+                    /*  'fileMap' => [
+                          'app' => 'app.php',
+                          'app/error' => 'error.php',
+                      ],*/
                 ],
             ],
         ],
@@ -82,6 +82,9 @@ $config = [
         ],
 
     ],
+    'as beforeRequest' => [
+        'class' => 'app\components\GetUserLanguage',
+        ],
     'params' => $params,
 ];
 

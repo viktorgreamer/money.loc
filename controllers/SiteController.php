@@ -54,6 +54,13 @@ class SiteController extends Controller
         ];
     }
 
+    public function actionChangeLg() {
+        if ($_POST['lg']) {
+            $_COOKIE['lg'] = $_POST['lg'];
+
+        }
+    }
+
     /**
      * Displays homepage.
      *

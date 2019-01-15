@@ -31,7 +31,7 @@ AppAsset::register($this);
     <?php
 
     NavBar::begin([
-        'brandLabel' => 'My Company',
+         'brandLabel' => '<img src="/web/favicon.ico" width="30px" class="pull-left"/>NEST SEQURITIES',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',

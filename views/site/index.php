@@ -7,13 +7,7 @@ $this->title = 'My Yii Application';
 <div class="site-index">
     <div class="container" style="padding-left: 150px;font-size: 30px">
         <div id="myCarousel" class="carousel slide" data-ride="carousel">
-            <!— Carousel indicators —>
-            <ol class="carousel-indicators">
-                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                <li data-target="#myCarousel" data-slide-to="1"></li>
-                <li data-target="#myCarousel" data-slide-to="2"></li>
-            </ol>
-            <!— Wrapper for carousel items —>
+            
             <div class="carousel-inner">
                 <div class="item active">
                     <div>“A stock is not just a ticker symbol or an electronic blip;<br> it is an ownership interest in an

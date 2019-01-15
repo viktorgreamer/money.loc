@@ -30,7 +30,7 @@ class InputDepositForm extends Model
     public function attributeLabels()
     {
         return [
-            'value' => 'value',
+            'value' => Yii::t('app','value'),
         ];
     }
 

@@ -4,9 +4,12 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
+/* @var $model \app\models\User */
 /* @var $WithdrawalForm app\models\forms\WithdrawalForm */
 /* @var $form ActiveForm */
 ?>
+
+
 <div class="input_deposit_form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -14,7 +17,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($WithdrawalForm, 'value') ?>
     
         <div class="form-group">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+            <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
         </div>
     <?php ActiveForm::end(); ?>
 

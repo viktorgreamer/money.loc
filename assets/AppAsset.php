@@ -26,6 +26,9 @@ class AppAsset extends AssetBundle
         "https://fonts.googleapis.com/css?family=Roboto+Slab",
     ];
     public $js = [
+        'js/main.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

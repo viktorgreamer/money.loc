@@ -16,6 +16,8 @@ class SignupForm extends Model
     public $username;
     public $email;
     public $password;
+    public $verify_password;
+    public $verify_email;
     public $first_name;
     public $last_name;
     public $company_name;
@@ -38,6 +40,7 @@ class SignupForm extends Model
     public $updated_at;
     public $agree_with_agreement;
     public $captcha;
+    public $person_type;
 
     /**
      * @inheritdoc
@@ -53,42 +56,50 @@ class SignupForm extends Model
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\app\models\User', 'message' => 'This email address has already been taken.'],
-            ['password', 'required'],
+            [['password','verify_password','verify_email'], 'required'],
             ['password', 'string', 'min' => 6],
-            [['first_name', 'last_name', 'address_line1', 'city', 'state', 'postal', 'country_id', 'lg', 'phone', 'birthday', 'email', 'username'], 'required'],
-            [['postal', 'country_id', 'lg', 'status', 'created_at', 'updated_at', 'agree_with_agreement'], 'integer'],
-            [['birthday'], 'safe'],
-            [['first_name', 'last_name', 'company_name', 'address_line1', 'address_line2', 'city', 'state', 'email', 'auth_key', 'password_hash', 'password_reset_token', 'add_contacts'], 'string', 'max' => 256],
-            [['phone'], 'string', 'max' => 15],
+            [['first_name', 'last_name', 'address_line1', 'city', 'postal','lg', 'country_id', 'phone', 'birthday', 'email', 'username','agree_with_agreement'], 'required'],
+            [['postal', 'country_id', 'status', 'created_at', 'updated_at', 'agree_with_agreement'], 'integer'],
+            [['birthday','lg','captcha','person_type'], 'safe'],
+            ['verify_email', 'compare', 'compareAttribute'=>'email', 'message'=>Yii::t('app', 'Emails don\'t match')],
+            ['verify_password', 'compare', 'compareAttribute'=>'password', 'message'=>Yii::t('app', 'Passwords don\'t match')],
+            [['first_name', 'last_name', 'company_name', 'address_line1', 'address_line2', 'city', 'email', 'auth_key', 'password_hash', 'password_reset_token', 'add_contacts'], 'string', 'max' => 256],
+            [['phone'], 'string', 'max' => 25],
+            [['person_type'], 'integer'],
+            // ['captcha', 'captcha'],
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app','ID'),
-            'first_name' => Yii::t('app','First Name'),
-            'last_name' => Yii::t('app','Last Name'),
-            'company_name' => Yii::t('app','Company Name'),
-            'address_line1' => Yii::t('app','Address Line1'),
-            'address_line2' => Yii::t('app','Address Line2'),
-            'City' => Yii::t('app','City'),
-            'State' => Yii::t('app','State'),
-            'postal' => Yii::t('app','Postal'),
-            'country_id' => Yii::t('app','Country ID'),
-            'lg' => Yii::t('app','c'),
-            'phone' => Yii::t('app','Phone'),
-            'birthday' => Yii::t('app','Birthday'),
-            'email' => Yii::t('app','Email'),
-            'username' => Yii::t('app','Username'),
-            'auth_key' => Yii::t('app','Auth Key'),
-            'password_hash' => Yii::t('app','Password Hash'),
-            'password_reset_token' => Yii::t('app','Password Reset Token'),
-            'status' => Yii::t('app','Status'),
-            'add_contacts' => Yii::t('app','Add Contacts'),
-            'created_at' => Yii::t('app','Created At'),
-            'updated_at' => Yii::t('app','Updated At'),
-            'agree_with_agreement' => Yii::t('app','I Agree with agreement'),
+            'id' => Yii::t('app', 'ID'),
+            'first_name' => Yii::t('app', 'First Name'),
+            'last_name' => Yii::t('app', 'Last Name'),
+            'company_name' => Yii::t('app', 'Company Name (Optional)'),
+            'address_line1' => Yii::t('app', 'Address Line'),
+            'address_line2' => Yii::t('app', 'Address Line2'),
+            'City' => Yii::t('app', 'City'),
+            'State' => Yii::t('app', 'State'),
+            'postal' => Yii::t('app', 'Postal/Zip code'),
+            'country_id' => Yii::t('app', 'Country'),
+            'lg' => Yii::t('app', 'Language'),
+            'phone' => Yii::t('app', 'Phone'),
+            'birthday' => Yii::t('app', 'Birthday'),
+            'email' => Yii::t('app', 'Email'),
+            'username' => Yii::t('app', 'Username'),
+            'auth_key' => Yii::t('app', 'Auth Key'),
+            'verify_password' => Yii::t('app', 'Verify Password '),
+            'verify_email' => Yii::t('app', 'Verify Email '),
+            'password_hash' => Yii::t('app', 'Password Hash'),
+            'password_reset_token' => Yii::t('app', 'Password Reset Token'),
+            'status' => Yii::t('app', 'Status'),
+            'add_contacts' => Yii::t('app', 'Additional Contacts (skype,facebook, etc.) '),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'agree_with_agreement' => Yii::t('app', 'I Agree with User Agreement'),
+            'captcha' =>  Yii::t('app', 'Verification Code'),
+            'person_type' =>  Yii::t('app', 'Account')
         ];
     }
 
@@ -100,7 +111,7 @@ class SignupForm extends Model
     public function signup()
     {
 
-        if (!$this->validate()) {
+        if ((!$this->validate())){
             return null;
         }
 
@@ -122,10 +133,11 @@ class SignupForm extends Model
         $user->phone = $this->phone;
         $user->birthday = $this->birthday;
         $user->add_contacts = $this->add_contacts;
-        $user->status = 10;
+        $user->status = User::WAIT_FOR_SMS;
         $user->created_at = time();
         $user->updated_at = time();
         $user->visited_at = time();
+        $user->person_type = $this->person_type;
         $user->role = User::ROLE_USER;
 
 

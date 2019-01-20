@@ -31,10 +31,10 @@ AppAsset::register($this);
     <?php
 
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => 'NEST admin',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
+            'class' => 'navbar navbar-fixed-top',
         ],
     ]);
 
@@ -43,15 +43,23 @@ AppAsset::register($this);
     ];
 
     $menuItems[] = ['label' => 'Users', 'url' => '/admin/users/'];
-    $menuItems[] = ['label' => 'Messages', 'url' => '/messages/index/'];
-    $menuItems[] = ['label' => 'Source-messages', 'url' => '/source-messages/index/'];
     $menuItems[] = ['label' => 'Payments', 'url' => '/admin/payments/'];
+
+    $menuItems[] = ['label' => 'Texts',
+        'items' =>
+            [
+                ['label' => 'Faqs', 'url' => '/admin/faq/index/'],
+                ['label' => 'Messages', 'url' => '/admin/messages/index/'],
+                ['label' => 'Source-messages', 'url' => '/admin/source-messages/index/']
+            ]
+
+    ];
 
     $menuItems[] = '<li>'
         . Html::beginForm(['/site/logout'], 'post')
         . Html::submitButton(
             'Logout (' . Yii::$app->user->identity->username . ')',
-            ['class' => 'btn btn-link logout']
+            ['class' => 'btn btn-link logout','style' => 'padding-top: 17px; color: #0f0f0f']
         )
         . Html::endForm()
         . '</li>';

@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\utils\D;
+use app\utils\P;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
@@ -40,16 +42,79 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_BLOCKED = 1;
+    const STATUS_ONDELETE = 2;
+    const WAIT_FOR_SMS = 3;
     const STATUS_ACTIVE = 10;
 
     const ROLE_USER = 1;
     const ROLE_ADMIN = 2;
     const SUPER_ADMIN = 3;
 
+    const COUNT_VERIFY_SMS_ATTEMPTS = 3;
+
+    /**
+     * Finds user by password reset token
+     *
+     * @param string $token password reset token
+     * @return static|null
+     */
+
+    public static function findByPasswordResetToken($token)
+    {
+        if (!static::isPasswordResetTokenValid($token)) {
+            D::alert(" PASSWORDS REST TOKEN IN BOT VALID");
+            return null;
+        }
+
+        return static::findOne([
+            'password_reset_token' => $token,
+            'status' => self::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * Generates new password reset token
+     */
+    public function generatePasswordResetToken()
+    {
+        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
+
+
+    public static function isPasswordResetTokenValid($token)
+    {
+        if (empty($token)) {
+
+            D::alert(" TOKEN IS EMPTY");
+            return false;
+        }
+
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
+        $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+
+        D::dump(['expiretime' => $timestamp + $expire, 'now' => time()]);
+        if (!($timestamp + $expire >= time())) D::alert(" TOKEN IS EXPIRE");
+        return $timestamp + $expire >= time();
+    }
+
+    /**
+     * Removes password reset token
+     */
+    public function removePasswordResetToken()
+    {
+        $this->password_reset_token = null;
+    }
+
 
     /**
      * {@inheritdoc}
      */
+    public function getCountry()
+    {
+        return $this->hasOne(Contries::className(), ['id' => 'country_id']);
+
+    }
+
     public static function tableName()
     {
         return 'users';
@@ -71,11 +136,68 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public static function mapLang()
     {
-        return [
+        return array_filter([
             'en' => "EN",
             'es' => 'ES'
-        ];
+        ], function ($index) {
+            return in_array($index, Yii::$app->params['languages']);
+        }, ARRAY_FILTER_USE_KEY);
     }
+
+    public function sendMail($text = '')
+    {
+        return Yii::$app->mailer->compose()
+            ->setFrom('info@mirs.pro')
+            ->setTo($this->email)
+            ->setSubject('From NEST')
+            ->setTextBody($text)
+            // ->setHtmlBody('<b>HTML content</b>')
+            ->send();
+    }
+
+    public function sendSms($message = 'sms')
+    {
+        $smsru = new Sms(Yii::$app->params['APISMS']); // Ваш уникальный программный ключ, который можно получить на главной странице
+
+        $data = new \stdClass();
+        $data->to = preg_replace("/-|\(|\)/", "", $this->phone);
+        $data->text = $message; // Текст сообщения
+// $data->from = ''; // Если у вас уже одобрен буквенный отправитель, его можно указать здесь, в противном случае будет использоваться ваш отправитель по умолчанию
+// $data->time = time() + 7*60*60; // Отложить отправку на 7 часов
+// $data->translit = 1; // Перевести все русские символы в латиницу (позволяет сэкономить на длине СМС)
+     //   $data->test = 1; // Позволяет выполнить запрос в тестовом режиме без реальной отправки сообщения
+// $data->partner_id = '1'; // Можно указать ваш ID партнера, если вы интегрируете код в чужую систему
+        $sms = $smsru->send_one($data); // Отправка сообщения и возврат данных в переменную
+
+        if ($sms->status == "OK") { // Запрос выполнен успешно
+            Yii::$app->session->setFlash('success','Wait for sms ');
+           return true;
+
+        } else {
+            Yii::$app->session->setFlash('danger','Error sending the Sms');
+          return false;
+        }
+
+    }
+
+    public function buildSmsHttpRequest()
+    {
+
+        $sms = urlencode($this->buildSms($this->generateCode()));
+        return "https://sms.ru/sms/send?api_id=" . Yii::$app->params['APISMS'] . "&to=" . $this->phone . "&msg=" . $sms . "&json=1";
+    }
+
+    public function generateCode()
+    {
+
+        return $this->sms = rand(100000, 999999);
+    }
+
+    public function buildSms($code)
+    {
+        return "Your code: " . $code;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -83,11 +205,12 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['first_name', 'last_name', 'address_line1', 'city', 'state', 'postal', 'country_id', 'lg', 'phone', 'birthday', 'email', 'username', 'auth_key', 'password_hash', 'status', 'created_at'], 'required'],
-            [['postal','role', 'country_id', 'status', 'created_at', 'updated_at', 'visited_at', 'billing'], 'integer'],
+            [['first_name', 'last_name', 'address_line1', 'city', 'postal', 'country_id', 'lg', 'phone', 'birthday', 'email', 'username', 'auth_key', 'password_hash', 'status', 'created_at'], 'required'],
+            [['postal', 'role', 'country_id', 'status', 'created_at', 'updated_at', 'visited_at', 'billing'], 'integer'],
             [['birthday'], 'safe'],
-            [['first_name', 'last_name', 'company_name', 'lg','address_line1', 'address_line2', 'city', 'state', 'email', 'username', 'add_contacts'], 'string', 'max' => 256],
+            [['first_name', 'last_name', 'company_name', 'lg', 'address_line1', 'address_line2', 'city', 'state', 'email', 'username', 'add_contacts'], 'string', 'max' => 256],
             [['phone'], 'string', 'max' => 15],
+            [['sms'], 'integer', 'max' => 999999],
         ];
     }
 
@@ -101,19 +224,39 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasOne(Payments::className(), ['user_id' => 'id']);
     }
 
+
     public function getDeposit()
     {
-        return $this->getPayments()->andWhere(['type' => Payments::DEPOSIT_TYPE])->sum('value');
+        if ($deposit = $this->getPayments()->andWhere(['type' => Payments::DEPOSIT_TYPE])->andWhere(['status' => Payments::STATUS_CONFIRMED])->sum('value')) {
+            return $deposit;
+
+        }  else return 0;
     }
 
     public function getWithdrawal()
     {
-        return $this->getPayments()->andWhere(['type' => Payments::WITHDRAWAL_TYPE])->sum('value');
+        if ($deposit = $this->getPayments()->andWhere(['type' => Payments::WITHDRAWAL_TYPE])->andWhere(['status' => Payments::STATUS_CONFIRMED])->sum('value')) {
+            return $deposit;
+
+        }  else return 0;
+    }
+
+    public function getBonuses()
+    {
+        return $this->getPayments()->andWhere(['type' => Payments::BONUS_TYPE])->andWhere(['status' => Payments::STATUS_CONFIRMED])->sum('value');
+
     }
 
     public function getCurrentValue()
     {
         return $this->billing;
+    }
+
+    public function beforeDelete()
+    {
+
+        Payments::deleteAll(['user_id' => $this->id]);
+        return parent::beforeDelete(); // TODO: Change the autogenerated stub
     }
 
     /**
@@ -122,30 +265,29 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'first_name' => 'First Name',
-            'last_name' => 'Last Name',
-            'company_name' => 'Company Name',
-            'address_line1' => 'Address Line1',
-            'address_line2' => 'Address Line2',
-            'City' => 'City',
-            'State' => 'State',
-            'postal' => 'Postal',
-            'country_id' => 'Country ID',
-            'lg' => 'Lg',
-            'phone' => 'Phone',
-            'birthday' => 'Birthday',
-            'email' => 'Email',
-            'username' => 'Username',
-            'auth_key' => 'Auth Key',
-            'password_hash' => 'Password Hash',
-            'password_reset_token' => 'Password Reset Token',
-            'status' => 'Status',
-            'add_contacts' => 'Add Contacts',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'visited_at' => 'Visited At',
-            'billing' => 'Billing',
+            'id' => Yii::t('app', 'ID'),
+            'first_name' => Yii::t('app', 'First Name'),
+            'last_name' => Yii::t('app', 'Last Name'),
+            'company_name' => Yii::t('app', 'Company Name'),
+            'address_line1' => Yii::t('app', 'Address Line1'),
+            'address_line2' => Yii::t('app', 'Address Line2'),
+            'City' => Yii::t('app', 'City'),
+            'State' => Yii::t('app', 'State'),
+            'postal' => Yii::t('app', 'Postal'),
+            'country_id' => Yii::t('app', 'Country'),
+            'lg' => Yii::t('app', 'Language'),
+            'phone' => Yii::t('app', 'Phone'),
+            'birthday' => Yii::t('app', 'Birthday'),
+            'email' => Yii::t('app', 'Email'),
+            'username' => Yii::t('app', 'Username'),
+            'auth_key' => Yii::t('app', 'Auth Key'),
+            'password_hash' => Yii::t('app', 'Password Hash'),
+            'password_reset_token' => Yii::t('app', 'Password Reset Token'),
+            'status' => Yii::t('app', 'Status'),
+            'add_contacts' => Yii::t('app', 'Add Contacts'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'agree_with_agreement' => Yii::t('app', 'I Agree with agreement'),
         ];
     }
 

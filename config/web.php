@@ -9,7 +9,7 @@ $config = [
     'bootstrap' => ['log'],
     'language' => 'en',
     // 'languages' => ['en', 'es'],
-    // 'sourceLanguage' => 'es',
+    'sourceLanguage' => 'en',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
@@ -37,7 +37,9 @@ $config = [
 
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-            'viewPath' => '@webroot/mail',
+            'enableSwiftMailerLogging' => true,
+
+            'viewPath' => '@app/mail',
             'useFileTransport' => false,
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
@@ -69,8 +71,11 @@ $config = [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'categories' => ['yii\swiftmailer\Logger::add'],
+
+                    'logFile' => '@app/runtime/logs/email.log',
                 ],
-            ],
+                            ],
         ],
         'db' => $db,
 
@@ -78,6 +83,12 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '/' => 'site/index',
+                '/admin' => '/admin',
+                '/faq' => '/faq/index',
+                "/signup" => '/users/signup',
+                "/user_agreement" => '/site/user_agreement',
+                "/login" => '/site/login'
             ],
         ],
 

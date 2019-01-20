@@ -1,18 +1,18 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 
 use Yii;
 use app\modules\admin\models\Faqs;
-use yii\data\ActiveDataProvider;
+use app\modules\admin\models\FaqsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * FaqsController implements the CRUD actions for Faqs model.
+ * FaqController implements the CRUD actions for Faqs model.
  */
-class FaqsController extends Controller
+class FaqController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -35,11 +35,11 @@ class FaqsController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Faqs::find(),
-        ]);
+        $searchModel = new FaqsSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }

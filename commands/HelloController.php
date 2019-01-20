@@ -8,6 +8,7 @@
 namespace app\commands;
 
 use app\models\Contries;
+use app\models\User;
 use app\modules\admin\models\Faqs;
 use app\utils\D;
 use Faker\Factory;
@@ -34,6 +35,24 @@ class HelloController extends Controller
         echo $message . "\n";
 
         return ExitCode::OK;
+    }
+
+    public function actionDeleteUsers()
+    {
+        D::$isConsole = true;
+        if ($users = User::find()->all()) {
+            foreach ($users as $user) {
+                $user->delete();
+
+            }
+        }
+    }
+
+    public function actionDeleteLost()
+    {
+        D::$isConsole = true;
+        $count = User::deleteAll(['AND', ['status' => User::WAIT_FOR_SMS], ['<', 'created_at', time() - 60 * 10]]);
+        D::alert($count);
     }
 
     public function actionGenerateFaqs()

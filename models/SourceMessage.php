@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "source_message".
@@ -21,6 +22,10 @@ class SourceMessage extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'source_message';
+    }
+
+    public static function map() {
+        return ArrayHelper::map(self::find()->all(),'id','message');
     }
 
     public static function mapLanguages()

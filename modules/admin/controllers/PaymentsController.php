@@ -54,6 +54,10 @@ class PaymentsController extends Controller
                     return json_encode(['status' => 0, 'message' => "The Payment ID " . $payment_id . " has already been confirmed"]);
                 } else {
                     $payment->status = Payments::STATUS_CONFIRMED;
+                    if ($payment->type == Payments::WITHDRAWAL_TYPE) {
+                        $payment->user->billing -= $payment->value;
+                    } else $payment->user->billing += $payment->value;
+                    $payment->user->update(false);
                     $payment->confirmed_at = time();
                     $payment->update(false);
                     return json_encode(['status' => 1, 'message' => "The Payment ID " . $payment_id . " has been confirmed"]);
@@ -61,6 +65,24 @@ class PaymentsController extends Controller
                 }
             }
 
+        }
+    }
+    
+    public function actionAddProfit()
+    {
+        $AddProfitForm = new \app\models\forms\AddProfitForm();
+
+        if ($AddProfitForm->load(Yii::$app->request->post())) {
+            if ($AddProfitForm->validate()) {
+                $payment = new Payments();
+                $payment->user_id = $AddProfitForm->user_id;
+                $payment->value = $AddProfitForm->value;
+                $payment->type = Payments::BONUS_TYPE;
+                $payment->status = Payments::STATUS_IN_PROCESSING;
+                $payment->created_at = time();
+                $payment->save();
+                Yii::$app->session->setFlash('success', ' Profit was added successfully.');
+            }
         }
     }
 
@@ -74,6 +96,11 @@ class PaymentsController extends Controller
                     return json_encode(['status' => 0, 'message' => "The Payment ID " . $payment_id . " has already been denied"]);
                 } else {
                     $payment->status = Payments::STATUS_DENIED;
+                    if ($payment->type == Payments::WITHDRAWAL_TYPE) {
+                        $payment->user->billing += $payment->value;
+                    } else $payment->user->billing -= $payment->value;
+                    $payment->user->update(false);
+
                     $payment->confirmed_at = time();
                     $payment->update(false);
                     return json_encode(['status' => 1, 'message' => "The Payment ID " . $payment_id . " has been denied"]);
@@ -83,6 +110,7 @@ class PaymentsController extends Controller
 
         }
     }
+
     public function actionInProcessing()
     {
         if ($payment_id = $_POST['payment_id']) {

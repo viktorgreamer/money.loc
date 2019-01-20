@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\User */
 
-$this->title = $model->id;
+$this->title = $model->getFullName();
 $this->params['breadcrumbs'][] = ['label' => 'User', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -17,19 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
     </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
+          //  'id',
             'first_name',
             'last_name',
             'company_name',
@@ -38,19 +31,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'city',
             'state',
             'postal',
-            'country_id',
+            'country.name',
             'lg',
             'phone',
             'birthday',
             'email:email',
             'username',
-            'auth_key',
-            'password_hash',
-            'password_reset_token',
-            'status',
+           // 'auth_key',
+           // 'password_hash',
+           // 'password_reset_token',
+           // 'status',
             'add_contacts',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
 

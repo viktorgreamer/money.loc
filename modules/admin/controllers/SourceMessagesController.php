@@ -1,18 +1,18 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 
 use Yii;
-use app\models\Message;
-use app\models\MessagesSearch;
+use app\models\SourceMessage;
+use app\models\SourceMessagesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * MessagesController implements the CRUD actions for Message model.
+ * SourceMessagesController implements the CRUD actions for SourceMessage model.
  */
-class MessagesController extends Controller
+class SourceMessagesController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,12 +30,12 @@ class MessagesController extends Controller
     }
 
     /**
-     * Lists all Message models.
+     * Lists all SourceMessage models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new MessagesSearch();
+        $searchModel = new SourceMessagesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,30 +45,29 @@ class MessagesController extends Controller
     }
 
     /**
-     * Displays a single Message model.
+     * Displays a single SourceMessage model.
      * @param integer $id
-     * @param string $language
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $language)
+    public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id, $language),
+            'model' => $this->findModel($id),
         ]);
     }
 
     /**
-     * Creates a new Message model.
+     * Creates a new SourceMessage model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Message();
+        $model = new SourceMessage();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id, 'language' => $model->language]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -77,19 +76,18 @@ class MessagesController extends Controller
     }
 
     /**
-     * Updates an existing Message model.
+     * Updates an existing SourceMessage model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
-     * @param string $language
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $language)
+    public function actionUpdate($id)
     {
-        $model = $this->findModel($id, $language);
+        $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id, 'language' => $model->language]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
@@ -98,31 +96,29 @@ class MessagesController extends Controller
     }
 
     /**
-     * Deletes an existing Message model.
+     * Deletes an existing SourceMessage model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
-     * @param string $language
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $language)
+    public function actionDelete($id)
     {
-        $this->findModel($id, $language)->delete();
+        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Message model based on its primary key value.
+     * Finds the SourceMessage model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @param string $language
-     * @return Message the loaded model
+     * @return SourceMessage the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $language)
+    protected function findModel($id)
     {
-        if (($model = Message::findOne(['id' => $id, 'language' => $language])) !== null) {
+        if (($model = SourceMessage::findOne($id)) !== null) {
             return $model;
         }
 

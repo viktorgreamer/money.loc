@@ -23,14 +23,14 @@ class InputDepositForm extends Model
     {
         return [
             ['value', 'required'],
-            ['value', 'integer'],
+            ['value', 'integer','min' => 1],
         ];
     }
 
     public function attributeLabels()
     {
         return [
-            'value' => Yii::t('app','value'),
+            'value' => Yii::t('app','Value'),
         ];
     }
 

@@ -38,7 +38,12 @@ use yii\widgets\ActiveForm;
 
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12">
-            <?= $form->field($model, 'birthday')->textInput() ?>
+            <?= $form->field($model, 'birthday')->widget(\kartik\date\DatePicker::className(), [
+                'type' => \kartik\date\DatePicker::TYPE_INPUT,
+                'pluginOptions' => [
+                    'autoclose' => true,
+                    'format' => 'yyyy-mm-dd'
+                ]]); ?>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12">
             <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
@@ -49,7 +54,7 @@ use yii\widgets\ActiveForm;
 
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12">
-            <?= $form->field($model, 'country_id')->dropDownList(\yii\helpers\ArrayHelper::map(\app\models\Contries::find()->all(), 'id', 'name')); ?>
+            <?= $form->field($model, 'country_id')->dropDownList(\yii\helpers\ArrayHelper::map(\app\models\Contries::find()->orderBy('name')->all(), 'id', 'name')); ?>
 
         </div>
         <div class="col-lg-4 col-md-6 col-sm-12">

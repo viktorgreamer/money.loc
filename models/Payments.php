@@ -64,7 +64,7 @@ class Payments extends \yii\db\ActiveRecord
         return [
             self::DEPOSIT_TYPE => 'Deposit',
             self::WITHDRAWAL_TYPE => 'Withdrawal',
-            self::BONUS_TYPE => 'Bonus',
+            self::BONUS_TYPE => 'Profit',
         ];
     }
 
@@ -109,6 +109,8 @@ class Payments extends \yii\db\ActiveRecord
             'Type' => Yii::t('app','Type'),
             'value' => Yii::t('app','Value'),
             'valueText' => Yii::t('app','Value'),
+            'statusText' => Yii::t('app','Status'),
+            'typeText' => Yii::t('app','Type'),
             'status' => Yii::t('app','Status'),
                 'confirm_status' => Yii::t('app','Confirm Status'),
             'confirmed_at' => Yii::t('app','Confirmed_at'),

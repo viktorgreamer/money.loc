@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\forms\EnterSmsCodeForm;
 use app\models\forms\SignupForm;
 use app\models\Payments;
+use app\utils\D;
 use Yii;
 use app\models\User;
 use app\models\UserSearch;
@@ -30,6 +32,20 @@ class UsersController extends Controller
             ],
         ];
     }
+
+    public function actions()
+    {
+        return [
+            'error' => [
+                'class' => 'yii\web\ErrorAction',
+            ],
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+                //  'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+            ],
+        ];
+    }
+
 
     /**
      * Lists all User models.
@@ -66,6 +82,12 @@ class UsersController extends Controller
         ]);
     }*/
 
+
+    public function actionStatement()
+    {
+        return $this->render('statement');
+    }
+
     public function actionSignup()
     {
         $model = new SignupForm();
@@ -73,9 +95,16 @@ class UsersController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
                 // form inputs are valid, do something here
-                $user = $model->signup();
-                //  Yii::$app->getUser()->login($user);
-                //  return $this->goHome();
+                if ($user = $model->signup()) {
+                    $user->sendSms($user->buildSms($user->generateCode()));
+                    $user->update(false);
+                    Yii::$app->session->set('user_id', $user->id);
+                    //  Yii::$app->getUser()->login($user);
+                    return $this->redirect('/users/verify-sms');
+                }
+
+            } else {
+                D::dump($model->errors);
             }
         }
 
@@ -91,18 +120,79 @@ class UsersController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView()
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if ($id = Yii::$app->user->id) {
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        } else {
+            return $this->goHome();
+        }
+
     }
 
     public function actionHome()
     {
+        if ($model = User::findOne(Yii::$app->user->identity->id)) {
+            $model->visited_at = time();
+            $model->update(false);
+            return $this->render('home', [
+                'model' => $model,
+            ]);
+        } else {
+           // Yii::$app->session->setFlash('danger', 'Wrong action');
+            $this->redirect("/");
+        }
+
+    }
+    public function actionRepeatSms() {
+        if ($user_id = $_POST['user_id']) {
+            if ($user = User::findOne($user_id)) {
+                $user->sendSms($user->buildSms($this->sms));
+            }
+        }
+    }
+
+    public function actionVerifySms()
+    {
+        $user_id = Yii::$app->session->get('user_id');
+        if (!$user = User::findOne($user_id)) return $this->redirect('home');
+
+        $count = Yii::$app->session->get('count_verify_attempts') + 1;
+        Yii::$app->session->set('count_verify_attempts', $count);
+
+        $model = new EnterSmsCodeForm();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->check($user)) {
+                $user->status = User::STATUS_ACTIVE;
+                $user->update(false);
+                // form inputs are valid, do something here
+                Yii::$app->getUser()->login($user);
+                return $this->redirect('/users/home');
+
+            } else {
+                Yii::$app->session->setFlash('danger',Yii::t('app','Code is wrong, Try again.'));
+            }
+        }
+
+        if ($user) {
+            $model->user_id = $user_id;
+
+            return $this->render('verify_sms_form', [
+                'model' => $model,
+                'count' => $count,
+            ]);
+        }
+
+    }
+
+    public function actionSms()
+    {
         $model = User::findOne(Yii::$app->user->identity);
         $model->visited_at = time();
         $model->update(false);
+        $model->sendSms();
         return $this->render('home', [
             'model' => $model,
         ]);
@@ -126,10 +216,12 @@ class UsersController extends Controller
                 $model->billing += $payment->value;
                 $model->update(false);
                 $payment->save();
-                Yii::$app->session->setFlash('success', 'Вы пополнили баланс на ' . $inputDepositForm->value);
+                Yii::$app->session->setFlash('success', ' We received information about your deposit, 
+                it will be processed as soon as your transfer  appears on our account');
             }
         }
 
+        $inputDepositForm->value = '';
 
         return $this->render('deposit', [
             'model' => $model,
@@ -154,13 +246,13 @@ class UsersController extends Controller
                 $payment->type = Payments::WITHDRAWAL_TYPE;
                 $payment->status = Payments::STATUS_IN_PROCESSING;
                 $payment->created_at = time();
-                $model->billing -= $payment->value;
+              //  $model->billing -= $payment->value;
                 $model->update(false);
                 $payment->save();
-                Yii::$app->session->setFlash('success', 'Withdrawal order done successfully  ' . $WithdrawalForm->value);
+                Yii::$app->session->setFlash('success', 'We received the information about your withdrawal,it will be processed in 48 hours');
             }
         }
-
+        $WithdrawalForm->value = '';
         return $this->render('withdrawal', [
             'model' => $model,
             'WithdrawalForm' => $WithdrawalForm,
@@ -173,24 +265,6 @@ class UsersController extends Controller
         $model->visited_at = time();
         $model->update(false);
         return $this->render('money_management', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Creates a new User model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new User();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
             'model' => $model,
         ]);
     }
@@ -222,12 +296,7 @@ class UsersController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
-    }
 
     /**
      * Finds the User model based on its primary key value.

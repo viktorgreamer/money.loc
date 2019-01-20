@@ -29,6 +29,17 @@ class UsersController extends Controller
         ];
     }
 
+    public function actionLoadDetailsAjax()
+    {
+        if ($user_id = $_POST['user_id']) {
+           if ($user = User::findOne($user_id)) {
+               return $this->renderPartial('user-details',['user' => $user]);
+           }
+
+        }
+
+    }
+
     /**
      * Lists all User models.
      * @return mixed
@@ -104,7 +115,17 @@ class UsersController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $user = $this->findModel($id);
+        if (Yii::$app->user->identity->role = User::ROLE_ADMIN) {
+            $user->status = User::STATUS_DELETED;
+            $user->update(false);
+        }
+        if (Yii::$app->user->identity->role = User::SUPER_ADMIN) {
+            $user->delete();
+            Yii::$app->session->setFlash("danger", 'User ' . $user->getFullName() . " was deleted successfully");
+
+        }
+
 
         return $this->redirect(['index']);
     }

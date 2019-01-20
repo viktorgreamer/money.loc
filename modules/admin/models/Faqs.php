@@ -5,7 +5,7 @@ namespace app\modules\admin\models;
 use Yii;
 
 /**
- * This is the model class for table "faqs".
+ * This is the model class for table "faq".
  *
  * @property int $id
  * @property string $question
@@ -19,7 +19,7 @@ class Faqs extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'faqs';
+        return 'faq';
     }
 
     /**
@@ -29,8 +29,7 @@ class Faqs extends \yii\db\ActiveRecord
     {
         return [
             [['question', 'answer', 'lg'], 'required'],
-            [['question', 'answer'], 'string'],
-            [['lg'], 'integer'],
+            [['question', 'answer','lg'], 'string'],
         ];
     }
 

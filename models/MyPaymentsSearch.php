@@ -56,7 +56,7 @@ class MyPaymentsSearch extends Payments
         }
 
         // grid filtering conditions
-
+        $query->andWhere(['user_id' => \Yii::$app->user->id]);
         if ($this->type) $query->andWhere(['type' => $this->type]);
         if ($this->id) $query->andWhere(['id' => $this->id]);
         if ($this->status) $query->andWhere(['status' => $this->status]);

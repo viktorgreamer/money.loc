@@ -61,8 +61,9 @@ class MessagesSearch extends Message
             'id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'language', $this->language])
-            ->andFilterWhere(['like', 'translation', $this->translation]);
+        if ($this->id) $query->andWhere(['if', $this->id]);
+        if ($this->translation) $query->andWhere(['like', 'translation', $this->translation]);
+        if ($this->language) $query->andWhere(['like', 'language', $this->language]);
 
         return $dataProvider;
     }
